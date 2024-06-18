@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Shortner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-6 rounded-lg shadow-lg">
+    <form class="space-y-4">
+      <div>
+        <label for="url" class="block text-sm font-medium text-gray-700">URL:</label>
+        <input type="text" id="url" name="url"
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          placeholder="Enter your URL">
+      </div>
+      <div>
+        <button type="submit"
+          class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Short
+          url</button>
+      </div>
+      <div id="short-url-container" class="hidden space-y-2">
+        <p class="text-sm text-gray-500">Shortened URL:</p>
+        <div class="flex items-center space-x-2">
+          <a href="#" id="short-url" class="text-indigo-600 hover:underline">Your shortened URL will appear here</a>
+          <button type="button" id="copy-button"
+            class="px-2 py-1 bg-gray-300 text-gray-700 font-semibold rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Copy</button>
+        </div>
+        <p id="copy-feedback" class="text-sm text-green-600 hidden">URL copied to clipboard!</p>
+      </div>
+    </form>
+  </div>
+  <div id="shortened-url"></div>
+
+  <script>
+    document.querySelector('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const url = document.querySelector('input').value;
+      const response = await fetch('/api/short', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ url })
+      });
+      const data = await response.json();
+      const shortUrl = data.short_url;
+
+      document.getElementById('short-url').href = shortUrl;
+      document.getElementById('short-url').textContent = shortUrl;
+      document.getElementById('short-url-container').classList.remove('hidden');
+    });
+
+    document.getElementById('copy-button').addEventListener('click', () => {
+      const shortUrl = document.getElementById('short-url').href;
+      navigator.clipboard.writeText(shortUrl).then(() => {
+        document.getElementById('copy-feedback').classList.remove('hidden');
+        setTimeout(() => {
+          document.getElementById('copy-feedback').classList.add('hidden');
+        }, 2000);
+      });
+    });
+  </script>
+
+</body>
+
+</html>
