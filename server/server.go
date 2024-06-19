@@ -27,10 +27,11 @@ type Request struct {
 	Url string `json:"url"`
 }
 
-func NewServer(conf *config.Config, rdb *redis.Client) *Server {
+func NewServer(conf *config.Config, rdb *redis.Client, ctx context.Context) *Server {
 	return &Server{
 		conf: conf,
 		db: rdb,
+		ctx: ctx,
 	}
 }
 
@@ -38,7 +39,6 @@ func (server *Server) Start() {
 
 	http.HandleFunc("GET /{hash}", func (w http.ResponseWriter, r *http.Request) {
 		hash := r.PathValue("hash")
-		
 		val, err := server.db.Get(server.ctx, hash).Result()
 		
 		if err != nil {

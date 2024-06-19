@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/fredyranthun/url-shortner/config"
 	"github.com/fredyranthun/url-shortner/database"
 	"github.com/fredyranthun/url-shortner/server"
@@ -22,8 +24,10 @@ type Config struct {
 	RdbPassword string
 }
 
+var ctx = context.Background()
+
 func main() {
 	conf := config.GetConfig()	
 	rdb := database.NewRedisClient(conf)
-	server.NewServer(conf, rdb).Start()
+	server.NewServer(conf, rdb, ctx).Start()
 }
